@@ -99,6 +99,17 @@ async def before_hourly():
 async def on_voice_state_update(member, before, after):
     """Détecte quand un membre rejoint un salon vocal."""
 
+    # Reconnexion automatique si le bot est déconnecté
+    if member == bot.user and before.channel is not None and after.channel is None:
+        await asyncio.sleep(3)
+        guild = bot.get_guild(GUILD_ID)
+        if guild:
+            channel = guild.get_channel(CHANNEL_ID)
+            if channel and isinstance(channel, discord.VoiceChannel):
+                await channel.connect()
+                print(f"[INFO] Reconnecté à #{channel.name}")
+        return
+
     # Ignorer si le membre ne vient pas d'arriver dans un salon
     if after.channel is None or before.channel == after.channel:
         return
