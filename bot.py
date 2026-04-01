@@ -57,9 +57,7 @@ async def play_sound(channel: discord.VoiceChannel, sound_file: str = None) -> N
         print(f"[ERREUR] {e}")
 
     finally:
-        # Toujours se déconnecter
-        if vc and vc.is_connected():
-            await vc.disconnect()
+        pass  # Le bot reste dans le salon
 
 
 @tasks.loop(hours=1)
