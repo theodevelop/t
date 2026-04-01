@@ -22,6 +22,7 @@ MEMBER_SOUNDS = {
 # ─────────────────────────────────────────────────────────────────────────────
 
 intents = discord.Intents.default()
+intents.members = True  # Nécessaire pour on_voice_state_update
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
@@ -82,7 +83,14 @@ async def before_hourly():
     """Attend que le bot soit prêt avant de démarrer la boucle."""
     await bot.wait_until_ready()
 
-    # Synchronisation sur l'heure pile (ex: 14:00:00 plutôt que 14:07:23)
+    # Jouer immédiatement au démarrage
+    guild = bot.get_guild(GUILD_ID)
+    if guild:
+        channel = guild.get_channel(CHANNEL_ID)
+        if channel and isinstance(channel, discord.VoiceChannel):
+            await play_sound(channel)
+
+    # Puis synchroniser sur l'heure pile (ex: 14:00:00 plutôt que 14:07:23)
     now = datetime.now()
     seconds_until_next_hour = 3600 - (now.minute * 60 + now.second)
     print(f"[INFO] Prochain son dans {seconds_until_next_hour // 60}m {seconds_until_next_hour % 60}s")
